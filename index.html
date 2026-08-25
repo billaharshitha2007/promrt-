@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProjectMatch AI - Intelligent Team Formation & Hackathon Matching</title>
+  <meta name="description" content="AI-driven team formation engine for hackathons and startups. Intelligent candidate screening, compatibility scoring, and real-time collaboration.">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+
+  <!-- Custom Design System CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient Cyber Glows -->
+  <div class="ambient-glow"></div>
+
+  <!-- Toast Notification Overlay -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Root App -->
+  <div id="app-root">
+
+    <!-- Viewport Container (Switchable between Mobile View and Desktop Command Center) -->
+    <div class="viewport-container" id="viewport-container">
+      <div class="device-shell">
+
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+          <div class="brand-container" id="brand-btn">
+            <div class="brand-logo">
+              <span class="material-symbols-outlined">hub</span>
+            </div>
+            <div>
+              <span class="brand-title">ProjectMatch AI</span>
+              <span class="brand-tag">v2.4 Live</span>
+            </div>
+          </div>
+
+          <div class="nav-actions">
+            <!-- View Mode Switcher (Mobile vs Desktop) -->
+            <button class="mode-toggle-btn" id="mode-toggle-btn" title="Toggle Desktop / Mobile Layout">
+              <span class="material-symbols-outlined text-[16px]">laptop_chromebook</span>
+              <span>Desktop View</span>
+            </button>
+
+            <!-- Quick Wizard Trigger -->
+            <button class="icon-btn" id="quick-setup-btn" title="Quick Setup Wizard">
+              <span class="material-symbols-outlined text-[20px]">tune</span>
+            </button>
+
+            <!-- Notifications Trigger -->
+            <button class="icon-btn" id="notifications-btn" title="Notifications">
+              <span class="material-symbols-outlined text-[20px]">notifications</span>
+              <span class="badge-dot"></span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main Viewport -->
+        <main class="main-viewport custom-scroll">
+
+          <!-- ===============================================================
+               SCREEN 1: Discovery Feed (Swipe Deck & AI Match Score)
+               =============================================================== -->
+          <section class="view-screen active" id="view-feed">
+            <div class="feed-container">
+
+              <!-- Card Stack -->
+              <div class="card-stack" id="card-stack">
+                <!-- Top Card dynamically inserted by js/app.js -->
+              </div>
+
+              <!-- Empty Deck State -->
+              <div class="deck-empty-state" id="deck-empty-state">
+                <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,229,255,0.2)]">
+                  <span class="material-symbols-outlined text-primary-fixed-dim text-3xl">auto_awesome</span>
+                </div>
+                <h3 class="text-xl font-bold text-on-surface mb-2">You've Reviewed All Matches!</h3>
+                <p class="text-xs text-on-surface-variant mb-6 leading-relaxed">
+                  Our AI engine is continuously analyzing new candidate submissions and team formation requests in real-time.
+                </p>
+                <button class="btn-primary-sm px-6 py-3 text-sm font-bold flex items-center gap-2" id="reset-deck-btn">
+                  <span class="material-symbols-outlined text-base">refresh</span>
+                  <span>Reload Discovery Deck</span>
+                </button>
+              </div>
+
+              <!-- Bottom Action Bar for Card -->
+              <div class="card-action-bar">
+                <button class="action-btn-pass" id="btn-pass" title="Pass (Swipe Left)">
+                  <span class="material-symbols-outlined text-2xl">close</span>
+                </button>
+
+                <button class="action-btn-interview" id="btn-interview" title="Start AI Fit Interview">
+                  <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                  <span>AI Fit Check</span>
+                </button>
+
+                <button class="action-btn-like" id="btn-like" title="Connect (Swipe Right)">
+                  <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                </button>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               SCREEN 2: Live Board & Teams Forming Hub
+               =============================================================== -->
+          <section class="view-screen" id="view-teams">
+            <div class="teams-board-container">
+
+              <!-- Live Activity Ticker Marquee -->
+              <div class="activity-ticker">
+                <div class="ticker-badge">
+                  <span class="pulse-dot"></span>
+                  <span class="ticker-label">Live</span>
+                </div>
+                <div class="overflow-hidden w-full">
+                  <div class="ticker-track" id="ticker-track">
+                    <!-- Events populated dynamically by app.js -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Event Countdown Card -->
+              <div class="event-countdown-card">
+                <div class="countdown-title">Hackathon Alpha Registration</div>
+                <div class="countdown-digits">
+                  <span id="countdown-hours">14</span><span class="countdown-unit">h</span>
+                  <span id="countdown-minutes">22</span><span class="countdown-unit">m</span>
+                  <span id="countdown-seconds" class="text-secondary-fixed">45</span><span class="countdown-unit text-secondary-fixed">s</span>
+                </div>
+                <p class="countdown-subtitle">Automated Team Formation Closes Soon</p>
+              </div>
+
+              <!-- Teams Section Header & Filters -->
+              <div class="section-header">
+                <h3 class="section-title">Teams Forming</h3>
+                <div class="filter-tabs">
+                  <button class="filter-tab active" data-filter="all">All Teams</button>
+                  <button class="filter-tab" data-filter="hackathons">Hackathon Alpha</button>
+                  <button class="filter-tab" data-filter="high-match">90%+ Match</button>
+                  <button class="filter-tab" data-filter="needs-dev">Needs Engineer</button>
+                </div>
+              </div>
+
+              <!-- Teams List Grid -->
+              <div class="teams-grid" id="teams-grid">
+                <!-- Dynamically generated team cards -->
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               SCREEN 3: Team Chat & Collaboration Hub
+               =============================================================== -->
+          <section class="view-screen" id="view-chat">
+            <div class="chat-screen-container">
+
+              <!-- Chat Sub Header -->
+              <div class="chat-sub-header">
+                <div class="chat-team-meta">
+                  <div class="chat-team-avatar" id="chat-team-avatar" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80')"></div>
+                  <div class="chat-team-details">
+                    <h3 id="chat-team-title">Team Cyber-X</h3>
+                    <div class="chat-team-status" id="chat-team-status">
+                      <span class="status-dot"></span>
+                      <span>3/5 Members Online</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="quick-action-pill" id="action-project-specs" style="color: var(--color-primary-fixed-dim); border-color: rgba(0,229,255,0.3);">
+                  <span class="material-symbols-outlined text-[16px]">description</span>
+                  <span>Project Specs</span>
+                </button>
+              </div>
+
+              <!-- Chat Quick Actions Bar -->
+              <div class="chat-quick-actions-bar">
+                <button class="quick-action-pill" id="action-schedule-sync">
+                  <span class="material-symbols-outlined text-[15px]">calendar_month</span>
+                  <span>Schedule Sync</span>
+                </button>
+                <button class="quick-action-pill" id="action-share-file">
+                  <span class="material-symbols-outlined text-[15px]">folder_shared</span>
+                  <span>Share File</span>
+                </button>
+                <button class="quick-action-pill" id="action-view-tasks">
+                  <span class="material-symbols-outlined text-[15px]">task_alt</span>
+                  <span>View Tasks</span>
+                </button>
+              </div>
+
+              <!-- Messages Scroll Area -->
+              <div class="chat-messages-area custom-scroll" id="chat-messages-area">
+                <!-- Populated dynamically by app.js -->
+              </div>
+
+              <!-- Chat Input Bar -->
+              <div class="chat-input-bar">
+                <div class="chat-input-box">
+                  <button class="text-on-surface-variant hover:text-on-surface p-1" title="Attach file">
+                    <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                  </button>
+                  <input type="text" class="chat-input-field" id="chat-input" placeholder="Message Team Cyber-X (or type /ai)..." autocomplete="off">
+                  <button class="text-primary-fixed-dim hover:text-primary-container p-1" title="Ask AI Assistant">
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">temp_preferences_custom</span>
+                  </button>
+                </div>
+                <button class="chat-send-btn" id="chat-send-btn" title="Send Message">
+                  <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+                </button>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               SCREEN 4: Profile & Reputation Metrics
+               =============================================================== -->
+          <section class="view-screen" id="view-profile">
+            <div class="profile-container">
+
+              <!-- Profile Hero Header -->
+              <div class="profile-hero">
+                <div class="profile-avatar-wrap">
+                  <div class="profile-avatar" style="background-image: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80')"></div>
+                  <div class="profile-edit-badge" title="Edit Profile">
+                    <span class="material-symbols-outlined text-[14px]">edit</span>
+                  </div>
+                </div>
+
+                <div>
+                  <h2 class="profile-name" id="profile-name">Alex Mercer</h2>
+                  <p class="profile-title" id="profile-title">Senior Full-Stack AI Engineer</p>
+                </div>
+
+                <div class="profile-tags" id="profile-tags">
+                  <!-- Skill chips -->
+                </div>
+              </div>
+
+              <!-- Reputation Metrics -->
+              <div class="metrics-card">
+                <div class="card-section-label flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm text-primary-fixed-dim">workspace_premium</span>
+                  <span>Reputation & Reliability</span>
+                </div>
+                <div class="metrics-grid">
+                  <div class="metric-item">
+                    <span class="material-symbols-outlined text-primary-fixed-dim">local_fire_department</span>
+                    <span class="metric-label">Top 1% Contributor</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="material-symbols-outlined text-secondary-fixed-dim">bolt</span>
+                    <span class="metric-label">Fast Responder (99%)</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="material-symbols-outlined text-tertiary-fixed-dim">military_tech</span>
+                    <span class="metric-label">12 Hackathons Won</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="material-symbols-outlined text-primary-container">psychology</span>
+                    <span class="metric-label">94% Fit Accuracy</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Real-time AI Match Suggestions -->
+              <div>
+                <div class="section-header mb-2">
+                  <h3 class="section-title">AI Match Suggestions</h3>
+                  <span class="brand-tag">Real-Time</span>
+                </div>
+                <div class="matches-list" id="matches-list">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- My Requests Activity Tracker -->
+              <div>
+                <div class="card-section-label mb-2 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm text-on-surface-variant">history</span>
+                  <span>Sent Applications & Invites</span>
+                </div>
+                <div class="requests-list" id="requests-list">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ===============================================================
+               SCREEN 5: Matches Overview View
+               =============================================================== -->
+          <section class="view-screen" id="view-matches">
+            <div class="profile-container">
+              <div class="section-header">
+                <div>
+                  <h2 class="text-xl font-bold text-on-surface">Top AI Compatibility Matches</h2>
+                  <p class="text-xs text-on-surface-variant">Ranked based on your verified skills & interview responses.</p>
+                </div>
+                <span class="badge-match">Live AI Ranking</span>
+              </div>
+
+              <div class="matches-list mt-3">
+                <div class="match-list-item">
+                  <div class="mini-score-gauge" style="--score: 96%;">
+                    <div class="mini-score-inner">96</div>
+                  </div>
+                  <div class="match-item-info">
+                    <h4>BioSync Alpha</h4>
+                    <p>Needs: Frontend Architect • PyTorch + Three.js</p>
+                  </div>
+                  <button class="btn-primary-sm btn-connect-match" data-target="BioSync Alpha">Connect</button>
+                </div>
+
+                <div class="match-list-item">
+                  <div class="mini-score-gauge" style="--score: 94%;">
+                    <div class="mini-score-inner">94</div>
+                  </div>
+                  <div class="match-item-info">
+                    <h4>Neon Horizon Studio</h4>
+                    <p>Needs: AI Engineer • Generative Tools</p>
+                  </div>
+                  <button class="btn-primary-sm btn-connect-match" data-target="Neon Horizon Studio">Connect</button>
+                </div>
+
+                <div class="match-list-item">
+                  <div class="mini-score-gauge" style="--score: 91%;">
+                    <div class="mini-score-inner">91</div>
+                  </div>
+                  <div class="match-item-info">
+                    <h4>Synthetix Pulse AI</h4>
+                    <p>Needs: WebGPU Specialist</p>
+                  </div>
+                  <button class="btn-primary-sm btn-connect-match" data-target="Synthetix Pulse AI">Connect</button>
+                </div>
+
+                <div class="match-list-item">
+                  <div class="mini-score-gauge" style="--score: 88%;">
+                    <div class="mini-score-inner">88</div>
+                  </div>
+                  <div class="match-item-info">
+                    <h4>Quantum Logistics</h4>
+                    <p>Needs: Data Architect • Go + Kafka</p>
+                  </div>
+                  <button class="btn-primary-sm btn-connect-match" data-target="Quantum Logistics">Connect</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+
+        <!-- Floating Action Button (FAB) for Post Idea -->
+        <button class="fab-btn" id="post-idea-fab" title="Post your project idea or pitch a team">
+          <span class="material-symbols-outlined text-lg font-bold">add</span>
+          <span>Post My Idea</span>
+        </button>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+          <button class="nav-tab-btn active" data-view="feed">
+            <span class="material-symbols-outlined">explore</span>
+            <span>Feed</span>
+          </button>
+          <button class="nav-tab-btn" data-view="teams">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Teams</span>
+          </button>
+          <button class="nav-tab-btn" data-view="chat">
+            <span class="material-symbols-outlined">chat</span>
+            <span>Chat</span>
+          </button>
+          <button class="nav-tab-btn" data-view="matches">
+            <span class="material-symbols-outlined">analytics</span>
+            <span>Matches</span>
+          </button>
+          <button class="nav-tab-btn" data-view="profile">
+            <span class="material-symbols-outlined">person</span>
+            <span>Profile</span>
+          </button>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =======================================================================
+       MODAL 1: AI Fit Candidate Interview Modal
+       ======================================================================= -->
+  <div class="modal-overlay" id="interview-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center border border-primary-fixed-dim/40 shadow-md">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-lg" style="font-variation-settings: 'FILL' 1;">hub</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-on-surface text-base">AI Candidate Interview</h3>
+            <p class="font-mono text-[11px] text-primary-fixed-dim uppercase" id="interview-target-title">Verification & Compatibility</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="interview-close-btn" title="Close Interview">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-[11px] font-bold text-on-surface-variant uppercase" id="interview-step-text">Step 1 of 3</span>
+          <span class="badge-match">Adaptive Scoring</span>
+        </div>
+
+        <div class="stepper-bar" id="interview-stepper">
+          <!-- Stepper segments -->
+        </div>
+
+        <div id="interview-content" class="flex flex-col gap-4">
+          <!-- Dynamically populated step content -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary-sm px-6 py-2.5 flex items-center gap-2" id="interview-next-btn">
+          <span>Continue</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 2: "Post My Idea" Pitch Modal
+       ======================================================================= -->
+  <div class="modal-overlay" id="pitch-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="w-9 h-9 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary-container/50">
+            <span class="material-symbols-outlined text-primary-container text-lg">lightbulb</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-on-surface text-base">Post Your Hackathon Idea</h3>
+            <p class="font-mono text-[11px] text-on-surface-variant">AI Team Formation Engine</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="pitch-close-btn">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <form id="pitch-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="pitch-title">Project Title</label>
+            <input type="text" id="pitch-title" class="form-input" placeholder="e.g. Autonomous AI Agent Network" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pitch-hackathon">Target Hackathon</label>
+            <select id="pitch-hackathon" class="form-select">
+              <option value="Hackathon Alpha">Hackathon Alpha (Registration in 14h)</option>
+              <option value="AI Genesis 2026">AI Genesis 2026</option>
+              <option value="ETH Global Pulse">ETH Global Pulse</option>
+              <option value="MedHacks 2026">MedHacks 2026</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pitch-desc">Pitch Summary & Vision</label>
+            <textarea id="pitch-desc" class="form-textarea" rows="3" placeholder="Briefly describe what you're building, core tech stack, and user problem..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pitch-role">Primary Role You Need</label>
+            <input type="text" id="pitch-role" class="form-input" placeholder="e.g. Senior UI/UX Designer, ML Engineer, Solidity Dev">
+          </div>
+
+          <div class="ai-insight-box">
+            <span class="material-symbols-outlined ai-insight-icon">auto_awesome</span>
+            <p class="ai-insight-text">
+              Upon posting, our AI match engine will automatically scan all registered candidates and suggest optimal teammates with conflict detection.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn-primary-sm px-6 py-2.5 flex items-center gap-2">
+            <span>Publish & Find Teammates</span>
+            <span class="material-symbols-outlined text-base">rocket_launch</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 3: Quick Setup / Onboarding Wizard Modal
+       ======================================================================= -->
+  <div class="modal-overlay" id="wizard-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="w-9 h-9 rounded-full bg-secondary-fixed/20 flex items-center justify-center border border-secondary-fixed/50">
+            <span class="material-symbols-outlined text-secondary-fixed text-lg">tune</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-on-surface text-base">Quick Profile Setup</h3>
+            <p class="font-mono text-[11px] text-secondary-fixed">Step 1 of 3: Skill & Intent</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="wizard-close-btn">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <form id="wizard-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">What is your primary superpower?</label>
+            <div class="bento-grid">
+              <label class="bento-option-btn">
+                <input type="radio" name="wizard-skill" value="Developer" checked class="hidden">
+                <span class="bento-opt-badge text-primary-fixed-dim">Developer</span>
+                <span class="bento-opt-desc">Full-Stack, React, Python, Go, Solidity</span>
+              </label>
+              <label class="bento-option-btn">
+                <input type="radio" name="wizard-skill" value="Designer" class="hidden">
+                <span class="bento-opt-badge text-tertiary-fixed-dim">Designer</span>
+                <span class="bento-opt-desc">UI/UX, Figma, Design Systems, 3D</span>
+              </label>
+              <label class="bento-option-btn">
+                <input type="radio" name="wizard-skill" value="Product Manager" class="hidden">
+                <span class="bento-opt-badge text-secondary-fixed">Product Manager</span>
+                <span class="bento-opt-desc">Scrum, Vision, Growth, Pitch Strategy</span>
+              </label>
+              <label class="bento-option-btn">
+                <input type="radio" name="wizard-skill" value="Marketing & Ops" class="hidden">
+                <span class="bento-opt-badge text-primary-fixed">Marketing & Ops</span>
+                <span class="bento-opt-desc">Community, Tokenomics, Content, Growth</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group mt-2">
+            <div class="flex justify-between items-center mb-1">
+              <label class="form-label">Weekly Commitment</label>
+              <span class="font-mono text-xs font-bold text-primary-fixed-dim" id="wizard-commitment-val">~20 hrs/week</span>
+            </div>
+            <input type="range" id="wizard-commitment" class="form-range" min="5" max="40" value="20" step="5" oninput="document.getElementById('wizard-commitment-val').textContent = '~' + this.value + ' hrs/week'">
+          </div>
+
+          <div class="form-group mt-2">
+            <label class="form-label">What is your goal for this cycle?</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="bento-option-btn p-3 text-center">
+                <input type="radio" name="wizard-goal" value="pitch" class="hidden">
+                <span class="material-symbols-outlined text-primary-fixed-dim mx-auto text-2xl">lightbulb</span>
+                <span class="font-bold text-xs mt-1">I'm Pitching An Idea</span>
+              </label>
+              <label class="bento-option-btn p-3 text-center selected">
+                <input type="radio" name="wizard-goal" value="join" checked class="hidden">
+                <span class="material-symbols-outlined text-secondary-fixed mx-auto text-2xl">search</span>
+                <span class="font-bold text-xs mt-1">Looking to Join a Team</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn-primary-sm px-6 py-2.5 flex items-center gap-2">
+            <span>Apply Preferences</span>
+            <span class="material-symbols-outlined text-base">check</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 4: Team Cyber-X Project Specifications Modal
+       ======================================================================= -->
+  <div class="modal-overlay" id="specs-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center border border-white/10">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-lg">description</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-on-surface text-base">Project Specifications</h3>
+            <p class="font-mono text-[11px] text-on-surface-variant">Team Cyber-X • Hackathon Alpha</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="specs-close-btn">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="p-3 bg-surface-container-lowest rounded-lg border border-white/5 font-mono text-xs text-on-surface space-y-2">
+          <p><strong class="text-primary-fixed-dim">Engine:</strong> Decentralized Multi-Agent Matcher v2</p>
+          <p><strong class="text-secondary-fixed">Backend:</strong> Go microservices + Redis pub/sub + GraphQL</p>
+          <p><strong class="text-tertiary-fixed-dim">Smart Contracts:</strong> Solidity (Arbitrum L2 escrow)</p>
+          <p><strong class="text-primary">Frontend:</strong> Vanilla CSS + Modern Modular JS + WebSockets</p>
+        </div>
+
+        <h4 class="font-bold text-sm text-on-surface mt-2">Architecture Deliverables</h4>
+        <ul class="text-xs text-on-surface-variant space-y-1.5 list-disc pl-4">
+          <li>High-throughput WebSocket streaming endpoint for live team formation ticker.</li>
+          <li>AI Conflict Detection engine (role overlap, skill balance scoring).</li>
+          <li>Smart calendar synchronization module for cross-timezone syncs.</li>
+          <li>End-to-end prototype demo ready for judging by Sunday.</li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary-sm px-6 py-2" onclick="document.getElementById('specs-modal').classList.remove('active')">
+          Close Specs
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
